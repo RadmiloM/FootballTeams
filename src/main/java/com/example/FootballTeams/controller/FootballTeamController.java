@@ -5,6 +5,7 @@ import com.example.FootballTeams.entity.FootballTeam;
 import com.example.FootballTeams.service.FootballTeamService;
 import lombok.Data;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -25,6 +26,14 @@ public class FootballTeamController {
         return footballTeamService.findById(id);
     }
 
+    @GetMapping("/externalApi")
+    public Object getScores() {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.openligadb.de/getmatchdata/bl1/2022/8";
+        Object response = restTemplate.getForObject(url, Object.class);
+        return response;
+    }
+
     @PostMapping("/createTeam")
     public void createTeam(@Valid @RequestBody FootballTeamDTO footballTeamDTO) {
         footballTeamService.createTeam(footballTeamDTO);
@@ -40,4 +49,5 @@ public class FootballTeamController {
         footballTeamService.updateTeam(footballTeamDTO, id);
 
     }
+
 }
