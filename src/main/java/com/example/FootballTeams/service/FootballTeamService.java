@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,12 +20,18 @@ import java.util.Optional;
 @Slf4j
 public class FootballTeamService {
 
+    private final Environment environment;
+
     private final FootballTeamMapping footballTeamMapping;
     private final FootballTeamRepository footballTeamRepository;
 
-    public FootballTeamService(FootballTeamMapping footballTeamMapping, FootballTeamRepository footballTeamRepository) {
+    private final EmailNotificationService emailNotificationService;
+
+    public FootballTeamService(Environment environment, FootballTeamMapping footballTeamMapping, FootballTeamRepository footballTeamRepository, EmailNotificationService emailNotificationService) {
+        this.environment = environment;
         this.footballTeamMapping = footballTeamMapping;
         this.footballTeamRepository = footballTeamRepository;
+        this.emailNotificationService = emailNotificationService;
     }
     @Cacheable(cacheNames = "footballTeam")
     public List<FootballTeam> findAll(){
@@ -39,19 +46,18 @@ public class FootballTeamService {
             log.info("If team is not present");
             throw new PlayerIdNotFoundException("Football team with player id " + id + " is not found in database");
         }
-        log.info("If team exists in database");
         return team.get();
     }
     @CacheEvict(cacheNames = "footballTeam",allEntries = true)
     public void createTeam(FootballTeam footballTeam){
-        log.info("Checking if team with player name exists in database");
+        String recipientEmail = environment.getProperty("spring.mail.username");
+        log.info("Fetching from database");
         if(footballTeamRepository.existsByPlayerName(footballTeam.getPlayerName())){
-            log.info("Team exists in database");
             throw new PlayerNameExistsInDatabase("Football team with player name " + footballTeam.getPlayerName()
             + " already exists in database");
         }
-        log.info("Saving new team");
         footballTeamRepository.save(footballTeam);
+        emailNotificationService.sendNewFootballTeamNotification(footballTeam,recipientEmail);
     }
 
     @CacheEvict(cacheNames = "footballTeam",key = "#id",allEntries = true)
@@ -72,14 +78,12 @@ public class FootballTeamService {
         log.info("Checking if team exists in database");
         Optional<FootballTeam> currentTeam = footballTeamRepository.findById(id);
         if(!currentTeam.isPresent()){
-            log.info("If team is not present in database");
             throw new PlayerIdNotFoundException("Football team with player id " + id + " does not exists");
         }
         if(footballTeamRepository.existsByPlayerName(team.getPlayerName())){
             throw new PlayerNameExistsInDatabase("Football team with player name " + team.getPlayerName()
                     + " already exists in database");
         }
-        log.info("Fetching current team from database");
         FootballTeam teamDB = currentTeam.get();
         log.info("Mapping from footballTeamDTO object to footballTeam");
         FootballTeam updatedTeam = footballTeamMapping.mapToEntity(teamDB,team);
