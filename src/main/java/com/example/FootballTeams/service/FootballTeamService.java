@@ -43,17 +43,15 @@ public class FootballTeamService {
         return team.get();
     }
     @CacheEvict(cacheNames = "footballTeam",allEntries = true)
-    public void createTeam(FootballTeamDTO footballTeamDTO){
+    public void createTeam(FootballTeam footballTeam){
         log.info("Checking if team with player name exists in database");
-        if(footballTeamRepository.existsByPlayerName(footballTeamDTO.getPlayerName())){
+        if(footballTeamRepository.existsByPlayerName(footballTeam.getPlayerName())){
             log.info("Team exists in database");
-            throw new PlayerNameExistsInDatabase("Football team with player name " + footballTeamDTO.getPlayerName()
+            throw new PlayerNameExistsInDatabase("Football team with player name " + footballTeam.getPlayerName()
             + " already exists in database");
         }
-        log.info("Team is not present in database mapping from footballTeamDTO to footballTeam");
-        FootballTeam savedFootballTeam = footballTeamMapping.mapToEntity(footballTeamDTO);
         log.info("Saving new team");
-        footballTeamRepository.save(savedFootballTeam);
+        footballTeamRepository.save(footballTeam);
     }
 
     @CacheEvict(cacheNames = "footballTeam",key = "#id",allEntries = true)
