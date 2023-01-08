@@ -4,6 +4,9 @@ import com.example.FootballTeams.dto.FootballTeamDTO;
 import com.example.FootballTeams.entity.FootballTeam;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class FootballTeamMapping {
 
@@ -35,5 +38,9 @@ public class FootballTeamMapping {
         footballTeam.setPrice(footballTeamDTO.getPrice());
         return  footballTeam;
 
+    }
+
+    public List<FootballTeamDTO> mapToDTO(List<FootballTeam> footballTeams){
+        return  footballTeams.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 }
