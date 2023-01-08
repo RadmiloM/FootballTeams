@@ -1,0 +1,20 @@
+<table xmlns:th="http://www.w3.org/1999/xhtml">
+    <thead>
+    <tr>
+        <th>Team</th>
+        <th>Player Name</th>
+        <th>Position</th>
+        <th>Skill Level</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="team : ${teamDTO}">
+        <td th:text="${team.team}"></td>
+        <td th:text="${team.playerName}"></td>
+        <td th:text="${team.position}"></td>
+        <td th:text="${team.skillLevel}"></td>
+        <td th:text="${team.price}"></td>
+    </tr>
+    </tbody>
+</table>
