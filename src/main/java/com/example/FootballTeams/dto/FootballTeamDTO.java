@@ -19,7 +19,7 @@ public class FootballTeamDTO {
     @Pattern(regexp = "^[A-Z][a-zA-Z\\s]*$", message = "player name must contain only letters and first letter must be uppercase")
     private String playerName;
     @NotBlank
-    @Size(max=8)
+    @Size(max = 8)
     @Pattern(regexp = "^[A-Z][a-zA-Z\\s]*$", message = "position must contain only letters and first letter must be uppercase")
     private String position;
     @NotNull

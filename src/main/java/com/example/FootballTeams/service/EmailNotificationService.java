@@ -16,15 +16,15 @@ public class EmailNotificationService {
     }
 
     @Async
-    public void sendNewFootballTeamNotification(FootballTeam footballTeam, String recipientEmail){
+    public void sendNewFootballTeamNotification(FootballTeam footballTeam, String recipientEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(recipientEmail);
         message.setSubject("New football team");
         message.setText("team: " + footballTeam.getTeam() + "\n" +
-                        "playerName: " + footballTeam.getPlayerName() + "\n" +
-                        "position: " + footballTeam.getPosition() + "\n" +
-                        "skillLevel: " + footballTeam.getSkillLevel() + "\n" +
-                        "price: " + footballTeam.getPrice());
+                "playerName: " + footballTeam.getPlayerName() + "\n" +
+                "position: " + footballTeam.getPosition() + "\n" +
+                "skillLevel: " + footballTeam.getSkillLevel() + "\n" +
+                "price: " + footballTeam.getPrice());
         mailSender.send(message);
     }
 }

@@ -23,13 +23,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                HttpHeaders headers,
                                                                HttpStatus status,
                                                                WebRequest request) {
-        HashMap<String,String> footballTeamErrors = new HashMap<>();
-        exceptions.getBindingResult().getAllErrors().forEach((error)-> {
+        HashMap<String, String> footballTeamErrors = new HashMap<>();
+        exceptions.getBindingResult().getAllErrors().forEach((error) -> {
             String footballTeamFieldError = ((FieldError) error).getField();
             String footballTeamMessage = error.getDefaultMessage();
-            footballTeamErrors.put(footballTeamFieldError,footballTeamMessage);
+            footballTeamErrors.put(footballTeamFieldError, footballTeamMessage);
         });
-        return new ResponseEntity<Object>(footballTeamErrors,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Object>(footballTeamErrors, HttpStatus.BAD_REQUEST);
     }
 
 

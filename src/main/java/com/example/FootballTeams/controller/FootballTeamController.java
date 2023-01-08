@@ -16,6 +16,7 @@ public class FootballTeamController {
     private final FootballTeamService footballTeamService;
 
     private final FootballTeamMapping footballTeamMapping;
+
     public FootballTeamController(FootballTeamService footballTeamService, FootballTeamMapping footballTeamMapping) {
         this.footballTeamService = footballTeamService;
         this.footballTeamMapping = footballTeamMapping;
@@ -25,7 +26,7 @@ public class FootballTeamController {
     public String getPage(Model model) {
         List<FootballTeam> teamDB = footballTeamService.findAll();
         List<FootballTeamDTO> teamDTO = footballTeamMapping.mapToDTO(teamDB);
-        model.addAttribute("teamDTO",teamDTO);
+        model.addAttribute("teamDTO", teamDTO);
         return "football_team";
     }
 }

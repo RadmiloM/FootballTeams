@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @Component
 public class FootballTeamMapping {
 
-    public FootballTeamDTO mapToDTO(FootballTeam footballTeam){
+    public FootballTeamDTO mapToDTO(FootballTeam footballTeam) {
         FootballTeamDTO footballTeamDTO = new FootballTeamDTO();
         footballTeamDTO.setTeam(footballTeam.getTeam());
         footballTeamDTO.setPlayerName(footballTeam.getPlayerName());
@@ -20,7 +20,7 @@ public class FootballTeamMapping {
         return footballTeamDTO;
     }
 
-    public FootballTeam mapToEntity(FootballTeamDTO footballTeamDTO){
+    public FootballTeam mapToEntity(FootballTeamDTO footballTeamDTO) {
         FootballTeam footballTeam = new FootballTeam();
         footballTeam.setTeam(footballTeamDTO.getTeam());
         footballTeam.setPlayerName(footballTeamDTO.getPlayerName());
@@ -30,17 +30,17 @@ public class FootballTeamMapping {
         return footballTeam;
     }
 
-    public FootballTeam mapToEntity(FootballTeam footballTeam,FootballTeamDTO footballTeamDTO){
+    public FootballTeam mapToEntity(FootballTeam footballTeam, FootballTeamDTO footballTeamDTO) {
         footballTeam.setTeam(footballTeamDTO.getTeam());
         footballTeam.setPlayerName(footballTeamDTO.getPlayerName());
         footballTeam.setPosition(footballTeamDTO.getPosition());
         footballTeam.setSkillLevel(footballTeamDTO.getSkillLevel());
         footballTeam.setPrice(footballTeamDTO.getPrice());
-        return  footballTeam;
+        return footballTeam;
 
     }
 
-    public List<FootballTeamDTO> mapToDTO(List<FootballTeam> footballTeams){
-        return  footballTeams.stream().map(this::mapToDTO).collect(Collectors.toList());
+    public List<FootballTeamDTO> mapToDTO(List<FootballTeam> footballTeams) {
+        return footballTeams.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 }

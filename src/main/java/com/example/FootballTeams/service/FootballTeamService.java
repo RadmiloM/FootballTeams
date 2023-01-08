@@ -33,60 +33,64 @@ public class FootballTeamService {
         this.footballTeamRepository = footballTeamRepository;
         this.emailNotificationService = emailNotificationService;
     }
+
     @Cacheable(cacheNames = "footballTeam")
-    public List<FootballTeam> findAll(){
+    public List<FootballTeam> findAll() {
         log.info("Fetching data from database");
         return footballTeamRepository.findAll();
     }
-    @Cacheable(cacheNames="footballTeam",key = "#id")
-    public FootballTeam findById(Integer id){
+
+    @Cacheable(cacheNames = "footballTeam", key = "#id")
+    public FootballTeam findById(Integer id) {
         log.info("Fetching football team from database");
         Optional<FootballTeam> team = footballTeamRepository.findById(id);
-        if(!team.isPresent()){
+        if (!team.isPresent()) {
             log.info("If team is not present");
             throw new PlayerIdNotFoundException("Football team with player id " + id + " is not found in database");
         }
         return team.get();
     }
-    @CacheEvict(cacheNames = "footballTeam",allEntries = true)
-    public void createTeam(FootballTeam footballTeam){
+
+    @CacheEvict(cacheNames = "footballTeam", allEntries = true)
+    public void createTeam(FootballTeam footballTeam) {
         String recipientEmail = environment.getProperty("spring.mail.username");
         log.info("Fetching from database");
-        if(footballTeamRepository.existsByPlayerName(footballTeam.getPlayerName())){
+        if (footballTeamRepository.existsByPlayerName(footballTeam.getPlayerName())) {
             throw new PlayerNameExistsInDatabase("Football team with player name " + footballTeam.getPlayerName()
-            + " already exists in database");
+                    + " already exists in database");
         }
         footballTeamRepository.save(footballTeam);
-        emailNotificationService.sendNewFootballTeamNotification(footballTeam,recipientEmail);
+        emailNotificationService.sendNewFootballTeamNotification(footballTeam, recipientEmail);
     }
 
-    @CacheEvict(cacheNames = "footballTeam",key = "#id",allEntries = true)
-    public void deleteById(Integer id){
+    @CacheEvict(cacheNames = "footballTeam", key = "#id", allEntries = true)
+    public void deleteById(Integer id) {
         log.info("Checking if team exists in database");
         Optional<FootballTeam> team = footballTeamRepository.findById(id);
-            if(!team.isPresent()){
-                log.info("If team is not present in database");
-                throw new PlayerIdNotFoundException("Team with player id " + id +
-                        " can not be deleted as player id does not exists in database");
-            }
+        if (!team.isPresent()) {
+            log.info("If team is not present in database");
+            throw new PlayerIdNotFoundException("Team with player id " + id +
+                    " can not be deleted as player id does not exists in database");
+        }
         log.info("Team successfully deleted");
         footballTeamRepository.deleteById(id);
     }
+
     @CachePut(cacheNames = "footballTeam", key = "#id")
-    @CacheEvict(cacheNames = "footballTeam",allEntries = true)
-    public void updateTeam(FootballTeamDTO team, Integer id){
+    @CacheEvict(cacheNames = "footballTeam", allEntries = true)
+    public void updateTeam(FootballTeamDTO team, Integer id) {
         log.info("Checking if team exists in database");
         Optional<FootballTeam> currentTeam = footballTeamRepository.findById(id);
-        if(!currentTeam.isPresent()){
+        if (!currentTeam.isPresent()) {
             throw new PlayerIdNotFoundException("Football team with player id " + id + " does not exists");
         }
-        if(footballTeamRepository.existsByPlayerName(team.getPlayerName())){
+        if (footballTeamRepository.existsByPlayerName(team.getPlayerName())) {
             throw new PlayerNameExistsInDatabase("Football team with player name " + team.getPlayerName()
                     + " already exists in database");
         }
         FootballTeam teamDB = currentTeam.get();
         log.info("Mapping from footballTeamDTO object to footballTeam");
-        FootballTeam updatedTeam = footballTeamMapping.mapToEntity(teamDB,team);
+        FootballTeam updatedTeam = footballTeamMapping.mapToEntity(teamDB, team);
         log.info("Team successfully updated");
         footballTeamRepository.save(updatedTeam);
     }
