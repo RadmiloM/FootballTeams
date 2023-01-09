@@ -1,0 +1,2 @@
+INSERT INTO users (name,password,role,created_at,updated_at) VALUES ('Radmilo','$2a$12$wc8MfmS0c3ZgOvue1OyDpeVPG908v32X.unmP/xiDyj/kiZJwidP6','ADMIN',NOW(),NOW());
+INSERT INTO users (name,password,role,created_at,updated_at) VALUES ('Milos','$2a$12$ldtRRfYrEe5EWLvVXO2HzOm1igf6UyAN7btapRKtCBx8bjV/n1QjO','USER',NOW(),NOW());
