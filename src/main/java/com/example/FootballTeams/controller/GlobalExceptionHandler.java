@@ -3,6 +3,7 @@ package com.example.FootballTeams.controller;
 import com.example.FootballTeams.error.ErrorResponse;
 import com.example.FootballTeams.exception.PlayerIdNotFoundException;
 import com.example.FootballTeams.exception.PlayerNameExistsInDatabase;
+import com.example.FootballTeams.exception.UsernameNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +44,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handlePlayerNameExists(PlayerNameExistsInDatabase playerNameExistsInDatabase) {
         ErrorResponse errorResponse = new ErrorResponse(playerNameExistsInDatabase.getMessage());
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePlayerNameExists(UsernameNotFoundException usernameNotFoundException) {
+        ErrorResponse errorResponse = new ErrorResponse(usernameNotFoundException.getMessage());
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }
