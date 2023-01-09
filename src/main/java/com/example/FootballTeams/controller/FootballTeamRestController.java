@@ -3,8 +3,13 @@ package com.example.FootballTeams.controller;
 import com.example.FootballTeams.dto.FootballTeamDTO;
 import com.example.FootballTeams.entity.FootballTeam;
 import com.example.FootballTeams.mapping.FootballTeamMapping;
+import com.example.FootballTeams.page.FootballTeamPageDTO;
 import com.example.FootballTeams.service.FootballTeamService;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +20,7 @@ import java.util.List;
 
 @RestController
 @Data
+@Slf4j
 public class FootballTeamRestController {
 
     private final FootballTeamMapping footballTeamMapping;
@@ -25,6 +31,28 @@ public class FootballTeamRestController {
         List<FootballTeam> footballTeams = footballTeamService.findAll();
         List<FootballTeamDTO> footballTeamDTOS = footballTeamMapping.mapToDTO(footballTeams);
         return ResponseEntity.ok(footballTeamDTOS);
+    }
+
+    @GetMapping("/fetchAllPages")
+    public ResponseEntity<FootballTeamPageDTO<?>> fetchAllPages(Pageable pageable) {
+        Page<FootballTeam> team = footballTeamService.findAll(pageable);
+        return ResponseEntity.ok(FootballTeamPageDTO.builder()
+                .data(team.getContent())
+                .pageNumber(team.getNumber())
+                .pageSize(team.getSize())
+                .totalPages(team.getTotalPages())
+                .build());
+    }
+
+    @GetMapping("/fetchPagesWithTeamName")
+    public ResponseEntity<FootballTeamPageDTO<?>> findByTeamPages(@RequestParam String team, @PageableDefault Pageable pageable) {
+        Page<FootballTeam> footballTeams = footballTeamService.findAllByTeamName(team, pageable);
+        return ResponseEntity.ok(FootballTeamPageDTO.builder()
+                .data(team)
+                .pageNumber(footballTeams.getNumber())
+                .pageSize(footballTeams.getSize())
+                .totalPages(footballTeams.getTotalPages())
+                .build());
     }
 
     @GetMapping("/findTeamById/{id}")
