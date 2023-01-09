@@ -11,6 +11,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,14 @@ public class FootballTeamService {
     public List<FootballTeam> findAll() {
         log.info("Fetching data from database");
         return footballTeamRepository.findAll();
+    }
+
+    public Page<FootballTeam> findAll(Pageable pageable){
+        return footballTeamRepository.findAll(pageable);
+    }
+
+    public Page<FootballTeam> findAllByTeamName(String team,Pageable pageable){
+        return footballTeamRepository.findAllByTeam(team,pageable);
     }
 
     @Cacheable(cacheNames = "footballTeam", key = "#id")
