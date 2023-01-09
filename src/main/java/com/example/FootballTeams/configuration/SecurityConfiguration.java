@@ -47,6 +47,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/*").permitAll()
                 .antMatchers("/fetchAllTeams").permitAll()
+                .antMatchers("/fetchAllPages").permitAll()
+                .antMatchers("/fetchPagesWithTeamName").permitAll()
                 .antMatchers("/findTeamById/{id}").hasAnyAuthority("USER","ADMIN")
                 .antMatchers("/externalApi").permitAll()
                 .antMatchers("/createTeam").hasAuthority("ADMIN")
