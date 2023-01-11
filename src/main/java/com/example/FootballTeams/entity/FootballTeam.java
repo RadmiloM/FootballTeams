@@ -1,12 +1,16 @@
 package com.example.FootballTeams.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Data
 @Table(name = "football_teams")
+@AllArgsConstructor
+@NoArgsConstructor
 public class FootballTeam {
 
     @Id
