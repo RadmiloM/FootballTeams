@@ -7,10 +7,10 @@ import com.example.FootballTeams.exception.PlayerNameExistsInDatabase;
 import com.example.FootballTeams.mapping.FootballTeamMapping;
 import com.example.FootballTeams.repository.FootballTeamRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,15 +23,15 @@ import java.util.Optional;
 @Slf4j
 public class FootballTeamService {
 
-    private final Environment environment;
 
+    @Value("${spring.mail.username}")
+    private String recipientEmail;
     private final FootballTeamMapping footballTeamMapping;
     private final FootballTeamRepository footballTeamRepository;
 
     private final EmailNotificationService emailNotificationService;
 
-    public FootballTeamService(Environment environment, FootballTeamMapping footballTeamMapping, FootballTeamRepository footballTeamRepository, EmailNotificationService emailNotificationService) {
-        this.environment = environment;
+    public FootballTeamService(FootballTeamMapping footballTeamMapping, FootballTeamRepository footballTeamRepository, EmailNotificationService emailNotificationService) {
         this.footballTeamMapping = footballTeamMapping;
         this.footballTeamRepository = footballTeamRepository;
         this.emailNotificationService = emailNotificationService;
@@ -43,12 +43,12 @@ public class FootballTeamService {
         return footballTeamRepository.findAll();
     }
 
-    public Page<FootballTeam> findAll(Pageable pageable){
+    public Page<FootballTeam> findAll(Pageable pageable) {
         return footballTeamRepository.findAll(pageable);
     }
 
-    public Page<FootballTeam> findAllByTeamName(String team,Pageable pageable){
-        return footballTeamRepository.findAllByTeam(team,pageable);
+    public Page<FootballTeam> findAllByTeamName(String team, Pageable pageable) {
+        return footballTeamRepository.findAllByTeam(team, pageable);
     }
 
     @Cacheable(cacheNames = "footballTeam", key = "#id")
@@ -65,7 +65,6 @@ public class FootballTeamService {
     @Transactional
     @CacheEvict(cacheNames = "footballTeam", allEntries = true)
     public void createTeam(FootballTeam footballTeam) {
-        String recipientEmail = environment.getProperty("spring.mail.username");
         log.info("Fetching from database");
         if (footballTeamRepository.existsByPlayerName(footballTeam.getPlayerName())) {
             throw new PlayerNameExistsInDatabase("Football team with player name " + footballTeam.getPlayerName()
