@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -45,7 +46,7 @@ class FootballTeamServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        footballTeamTestService = new FootballTeamService(null, footballTeamRepository, null);
+        footballTeamTestService = new FootballTeamService(null, footballTeamRepository, emailNotificationService);
     }
 
 
@@ -82,7 +83,7 @@ class FootballTeamServiceTest {
     void whenFindTeamByIdIsCorrect() {
         // given
         int number = 1;
-        FootballTeam footballTeam = new FootballTeam(number,"Arsenal","Martin Odegard","MC",99,1200000);
+        FootballTeam footballTeam = new FootballTeam(number, "Arsenal", "Martin Odegard", "MC", 99, 1200000);
         //when
         Mockito.when(footballTeamRepository.findById(number)).thenReturn(Optional.of(footballTeam));
         // then
@@ -100,7 +101,7 @@ class FootballTeamServiceTest {
         given(footballTeamRepository.findById(number))
                 .willReturn(footballTeam);
         // then
-        assertThrows(PlayerIdNotFoundException.class,() ->  {
+        assertThrows(PlayerIdNotFoundException.class, () -> {
             footballTeamTestService.findById(number);
         });
     }
@@ -124,7 +125,7 @@ class FootballTeamServiceTest {
 
         FootballTeam capturedFootballTeam = footballTeamArgumentCaptor.getValue();
         assertThat(capturedFootballTeam).isEqualTo(footballTeam);
-        doNothing().when(emailNotificationService).sendNewFootballTeamNotification(any(),anyString());
+        doNothing().when(emailNotificationService).sendNewFootballTeamNotification(any(), anyString());
     }
 
     @Test
@@ -142,19 +143,33 @@ class FootballTeamServiceTest {
                 .hasMessageContaining("Football team with player name " + footballTeam.getPlayerName()
                         + " already exists in database");
         //then
-        Mockito.verify(footballTeamRepository,Mockito.never()).save(any());
+        Mockito.verify(footballTeamRepository, Mockito.never()).save(any());
     }
 
     @Test
-    void deleteById() {
+    void deleteWhenFootballTeamExistsById() {
         // given
         int number = 1;
-        FootballTeam footballTeam = new FootballTeam(number,"Arsenal","Martin Odegard","MC",99,1200000);
+        FootballTeam footballTeam = new FootballTeam(number, "Arsenal", "Martin Odegard", "MC", 99, 1200000);
         //when
         Mockito.when(footballTeamRepository.findById(number)).thenReturn(Optional.of(footballTeam));
         footballTeamTestService.deleteById(number);
         // then
         Mockito.verify(footballTeamRepository).deleteById(number);
+    }
+
+    @Test
+    void deleteWhenFootballTeamPlayerDoesNotExistsById() {
+        // given
+        int number = 99;
+        //when
+        Mockito.when(footballTeamRepository.findById(number)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> footballTeamTestService.deleteById(number))
+                .isInstanceOf(PlayerIdNotFoundException.class)
+                .hasMessageContaining("Team with player id " + number +
+                        " can not be deleted as player id does not exists in database");
+        // then
+        Mockito.verify(footballTeamRepository, Mockito.never()).deleteById(number);
     }
 
     @Test
@@ -166,7 +181,7 @@ class FootballTeamServiceTest {
         team.setPosition("MC");
         team.setSkillLevel(85);
         team.setPrice(130000);
-        Optional<FootballTeam> currentTeam = Optional.of(new FootballTeam(id,"Arsenal","Alexandre Lacazette","MC",99,1200000));
+        Optional<FootballTeam> currentTeam = Optional.of(new FootballTeam(id, "Arsenal", "Alexandre Lacazette", "MC", 99, 1200000));
         given(footballTeamRepository.findById(id))
                 .willReturn(currentTeam);
         given(footballTeamRepository.existsByPlayerName(team.getPlayerName()))
@@ -174,7 +189,7 @@ class FootballTeamServiceTest {
 
         // when
         FootballTeam team1 = currentTeam.get();
-        footballTeamMapping.mapToEntity(team1,team);
+        footballTeamMapping.mapToEntity(team1, team);
 
         // then
         verify(footballTeamRepository).findById(id);
