@@ -10,10 +10,7 @@ import lombok.var;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -37,7 +34,7 @@ class FootballTeamServiceTest {
     @Mock
     private FootballTeamRepository footballTeamRepository;
     private FootballTeamService footballTeamTestService;
-
+    @Mock
     private FootballTeamMapping footballTeamMapping;
 
     @Mock
@@ -46,7 +43,7 @@ class FootballTeamServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        footballTeamTestService = new FootballTeamService(null, footballTeamRepository, emailNotificationService);
+        footballTeamTestService = new FootballTeamService(footballTeamMapping, footballTeamRepository, emailNotificationService);
     }
 
 
@@ -173,27 +170,21 @@ class FootballTeamServiceTest {
     }
 
     @Test
-    void updateTeam() {
-        int id = 1;
-        FootballTeamDTO team = new FootballTeamDTO();
-        team.setTeam("Arsenal");
-        team.setPlayerName("Mesut Ozil");
-        team.setPosition("MC");
-        team.setSkillLevel(85);
-        team.setPrice(130000);
-        Optional<FootballTeam> currentTeam = Optional.of(new FootballTeam(id, "Arsenal", "Alexandre Lacazette", "MC", 99, 1200000));
-        given(footballTeamRepository.findById(id))
-                .willReturn(currentTeam);
-        given(footballTeamRepository.existsByPlayerName(team.getPlayerName()))
-                .willReturn(false);
-
-        // when
-        FootballTeam team1 = currentTeam.get();
-        footballTeamMapping.mapToEntity(team1, team);
-
-        // then
-        verify(footballTeamRepository).findById(id);
-        verify(footballTeamRepository).existsByPlayerName(team.getPlayerName());
-        verify(footballTeamRepository).save(currentTeam.get());
+    void whenFootballTeamDTOWillUpdateFootballTeamWhichExistsInDatabase() {
+        // given
+        Integer number = 1;
+        FootballTeamDTO footballTeamDTO = new FootballTeamDTO();
+        footballTeamDTO.setTeam("Barcelona");
+        footballTeamDTO.setPlayerName("Xavi");
+        footballTeamDTO.setPosition("MC");
+        footballTeamDTO.setSkillLevel(91);
+        footballTeamDTO.setPrice(1200000);
+        String playerName = "Iniesta";
+        FootballTeam footballTeam = new FootballTeam(1, "Barcelona", playerName, "MC", 90, 1200000);
+        Mockito.when(footballTeamRepository.findById(number)).thenReturn(Optional.of(footballTeam));
+        Mockito.when(footballTeamRepository.existsByPlayerName(playerName)).thenReturn(false);
+        Mockito.when(footballTeamMapping.mapToEntity(footballTeam, footballTeamDTO)).thenReturn(footballTeam);
+        footballTeamTestService.updateTeam(footballTeamDTO, number);
+        Mockito.verify(footballTeamRepository).save(footballTeam);
     }
 }
